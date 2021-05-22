@@ -478,59 +478,46 @@ public class VehicleControl : MonoBehaviour
 
         lastSpeed = speed;
 
-
-
-
         if (slip2 != 0.0f)
             slip2 = Mathf.MoveTowards(slip2, 0.0f, 0.1f);
 
-
-
         myRigidbody.centerOfMass = carSetting.shiftCentre;
-
-
-
 
         if (activeControl)
         {
+            accel = 0;
+            brake = false;
+            shift = false;
 
-            if (controlMode == ControlMode.simple)
-            {
-
-
-                accel = 0;
-                brake = false;
-                shift = false;
-
-                if (carWheels.wheels.frontWheelDrive || carWheels.wheels.backWheelDrive)
-                {
-                    steer = Mathf.MoveTowards(steer, Input.GetAxis("Horizontal"), 0.2f);
+            if (carWheels.wheels.frontWheelDrive || carWheels.wheels.backWheelDrive) {
+                if (controlMode == ControlMode.simple) { // front truck
+                    steer = Mathf.MoveTowards(steer, Input.GetAxis("Horizontal"), 0.1f);
                     accel = Input.GetAxis("Vertical");
                     brake = Input.GetButton("Jump");
                     shift = Input.GetKey(KeyCode.LeftShift) | Input.GetKey(KeyCode.RightShift);
-
-
+                } else { // rear truck
+                    if (Input.GetKey(KeyCode.L)) {
+                        steer = Mathf.MoveTowards(steer, 1.0f, 0.1f);
+                    } else if (Input.GetKey(KeyCode.J)) {
+                        steer = Mathf.MoveTowards(steer, -1.0f, 0.1f);
+                    } else {
+                        steer = Mathf.MoveTowards(steer, 0, 0.1f);
+                    }
+                    if (Input.GetKey(KeyCode.I)) {
+                        accel = Mathf.MoveTowards(accel, 0.1f, 0.1f);
+                    } else if (Input.GetKey(KeyCode.K)) {
+                        accel = Mathf.MoveTowards(accel, -0.1f, 0.1f);
+                    } else {
+                        accel = Mathf.MoveTowards(accel, 0f, 0.1f);
+                    }
                 }
-
             }
-            else if (controlMode == ControlMode.touch)
-            {
-
-                if (accelFwd != 0) { accel = accelFwd; } else { accel = accelBack; }
-                steer = Mathf.MoveTowards(steer, steerAmount, 0.07f);
-
-            }
-
-        }
-        else
-        {
+        } else {
             accel = 0.0f;
             steer = 0.0f;
             brake = false;
             shift = false;
         }
-
-
 
         if (!carWheels.wheels.frontWheelDrive && !carWheels.wheels.backWheelDrive)
             accel = 0.0f;
@@ -630,7 +617,7 @@ public class VehicleControl : MonoBehaviour
 
 
 
-        wantedRPM = (5500.0f * accel) * 0.1f + wantedRPM * 0.9f;
+        wantedRPM = (2500.0f * accel) * 0.1f + wantedRPM * 0.9f;
 
         float rpm = 0.0f;
         int motorizedWheels = 0;
@@ -714,9 +701,11 @@ public class VehicleControl : MonoBehaviour
                 col.brakeTorque = accel == 0 || NeutralGear ? col.brakeTorque = 1000 : col.brakeTorque = 0;
 
 
-                slip = speed > 0.0f ?
-    (speed > 100 ? slip = Mathf.Lerp(slip, 1.0f + Mathf.Abs(steer), 0.02f) : slip = Mathf.Lerp(slip, 1.5f, 0.02f))
-    : slip = Mathf.Lerp(slip, 0.01f, 0.02f);
+                slip = speed > 0.0f
+                    ? (speed > 100
+                        ? Mathf.Lerp(slip, 1.0f + Mathf.Abs(steer), 0.02f)
+                        : Mathf.Lerp(slip, 1.5f, 0.02f))
+                    : Mathf.Lerp(slip, 0.01f, 0.02f);
 
 
                 w_rotate = w.rotation;

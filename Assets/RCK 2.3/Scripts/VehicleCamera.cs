@@ -134,78 +134,6 @@ public class VehicleCamera : MonoBehaviour
     }
 
 
-
-
-    public void ShowCarUI()
-    {
-
-
-
-        gearst = carScript.currentGear;
-        CarUI.speedText.text = ((int)carScript.speed).ToString();
-
-
-
-
-        if (carScript.carSetting.automaticGear)
-        {
-
-            if (gearst > 0 && carScript.speed > 1)
-            {
-                CarUI.GearText.color = Color.green;
-                CarUI.GearText.text = gearst.ToString();
-            }
-            else if (carScript.speed > 1)
-            {
-                CarUI.GearText.color = Color.red;
-                CarUI.GearText.text = "R";
-            }
-            else
-            {
-                CarUI.GearText.color = Color.white;
-                CarUI.GearText.text = "N";
-            }
-
-        }
-        else
-        {
-
-            if (carScript.NeutralGear)
-            {
-                CarUI.GearText.color = Color.white;
-                CarUI.GearText.text = "N";
-            }
-            else
-            {
-                if (carScript.currentGear != 0)
-                {
-                    CarUI.GearText.color = Color.green;
-                    CarUI.GearText.text = gearst.ToString();
-                }
-                else
-                {
-
-                    CarUI.GearText.color = Color.red;
-                    CarUI.GearText.text = "R";
-                }
-            }
-
-        }
-
-
-
-
-
-        thisAngle = (carScript.motorRPM / 20) - 175;
-        thisAngle = Mathf.Clamp(thisAngle, -180, 90);
-
-        CarUI.tachometerNeedle.rectTransform.rotation = Quaternion.Euler(0, 0, -thisAngle);
-        CarUI.barShiftGUI.rectTransform.localScale = new Vector3(carScript.powerShift / 100.0f, 1, 1);
-
-    }
-
-
-
     void Start()
     {
 
@@ -228,33 +156,8 @@ public class VehicleCamera : MonoBehaviour
 
         carScript = (VehicleControl)target.GetComponent<VehicleControl>();
 
-
-
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            RestCar();
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Application.LoadLevel(Application.loadedLevel);
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            PoliceLightSwitch();
-        }
-
-
         if (restTime!=0.0f)
         restTime=Mathf.MoveTowards(restTime ,0.0f,Time.deltaTime);
-
-
-
-
-        ShowCarUI();
 
         GetComponent<Camera>().fieldOfView = Mathf.Clamp(carScript.speed / 10.0f + 60.0f, 60, 90.0f);
 
